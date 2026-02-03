@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>❤️</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body { overflow-x: hidden; }
+        .transition-all { transition: all 0.3s ease-in-out; }
+        
+        @keyframes shake {
+            0% { transform: translateX(0); }
+            25% { transform: translateX(-10px); }
+            50% { transform: translateX(10px); }
+            75% { transform: translateX(-10px); }
+            100% { transform: translateX(0); }
+        }
+        .shake { animation: shake 0.3s ease-in-out; }
+
+        .heart {
+            position: fixed;
+            bottom: -10%;
+            color: #ff4d4d;
+            font-size: 20px;
+            user-select: none;
+            pointer-events: none;
+            z-index: 50; 
+            animation: floatUp 4s linear forwards;
+        }
+
+        @keyframes floatUp {
+            0% {
+                transform: translateY(0) translateX(0) rotate(0deg);
+                opacity: 1;
+            }
+            100% {
+                transform: translateY(-110vh) translateX(var(--sway)) rotate(360deg);
+                opacity: 0;
+            }
+        }
+    </style>
+</head>
+<body class="bg-pink-100 flex flex-col items-center justify-center min-h-screen font-sans p-4">
+
+    <div id="cover-page" class="relative z-20 text-center bg-white p-10 rounded-3xl shadow-xl max-w-2xl w-full mx-4">
+        <img src="https://i.pinimg.com/originals/d4/65/89/d46589e62e342303f061fe39cf5f90b7.gif" 
+             alt="Cover GIF" class="mx-auto mb-6 max-w-full h-auto max-h-[300px] object-contain">
+        <h1 class="text-4xl font-bold text-pink-600 mb-8">锘希 ❤️</h1>
+        <button id="openBtn" class="bg-pink-500 hover:bg-pink-600 text-white font-bold py-4 px-12 rounded-full transition-all text-xl shadow-lg transform hover:scale-110">
+            Open
+        </button>
+    </div>
+
+    <div id="valentine-page" class="hidden relative z-20 text-center bg-white p-10 rounded-3xl shadow-xl max-w-2xl w-full mx-4">
+        <img id="display-image" 
+             src="https://i.pinimg.com/originals/51/ba/da/51bada98f5067126eaea2ddd83a91a51.gif" 
+             alt="Valentine GIF" class="mx-auto mb-6 max-w-full h-auto max-h-[400px] object-contain">
+        
+        <div id="question-content">
+            <h1 id="main-question" class="text-3xl font-bold text-pink-600 mb-8">Will you be my Valentine? 🌹</h1>
+            <div class="flex flex-col sm:flex-row justify-center items-center gap-12 relative min-h-[150px]">
+                <button id="yesBtn" class="relative z-10 bg-green-500 hover:bg-green-600 text-white font-bold py-3 px-8 rounded-full transition-all text-lg shadow-lg">
+                    Yes
+                </button>
+                <button id="noBtn" class="relative z-30 bg-red-500 hover:bg-red-600 text-white font-bold py-3 px-8 rounded-full transition-all text-lg shadow-lg whitespace-nowrap">
+                    No
+                </button>
+            </div>
+        </div>
+
+        <div id="success-content" class="hidden">
+            <h1 class="text-4xl font-bold text-pink-600 mb-4">Yay! ❤️</h1>
+            <p class="text-gray-600 text-xl italic">Keep an eye out for what this "entails"!</p>
+        </div>
+    </div>
+
+    <script>
+        const coverPage = document.getElementById('cover-page');
+        const valentinePage = document.getElementById('valentine-page');
+        const openBtn = document.getElementById('openBtn');
+        const yesBtn = document.getElementById('yesBtn');
+        const noBtn = document.getElementById('noBtn');
+        const displayImage = document.getElementById('display-image');
+        const questionContent = document.getElementById('question-content');
+        const successContent = document.getElementById('success-content');
+        
+        const phrases = [
+            "No", "Are you sure?", "Really sure??", "Think again!", 
+            "Last chance!", "Surely not?", "You might regret this!", 
+            "Have a heart!", "Don't do this to me...", "REALLY FINAL ANSWER?"
+        ];
+        
+        let noCount = 0;
+        
+        function createHeart() {
+            const heart = document.createElement('div');
+            heart.classList.add('heart');
+            heart.innerHTML = '❤️';
+            heart.style.left = Math.random() * 100 + 'vw';
+            const sway = (Math.random() * 200 - 100) + 'px';
+            heart.style.setProperty('--sway', sway);
+            heart.style.animationDuration = (Math.random() * 2 + 3) + 's';
+            document.body.appendChild(heart);
+            setTimeout(() => heart.remove(), 4000);
+        }
+        
+        openBtn.addEventListener('click', () => {
+            coverPage.classList.add('hidden');
+            valentinePage.classList.remove('hidden');
+            setInterval(createHeart, 300); 
+        });
+        
+        const moveButton = (e) => {
+            if (e && e.type === 'touchstart') e.preventDefault();
+        
+            if (noCount >= 10) {
+                const padding = 20;
+                const maxWidth = window.innerWidth - noBtn.offsetWidth - padding;
+                const maxHeight = window.innerHeight - noBtn.offsetHeight - padding;
+                
+                const randomX = Math.max(padding, Math.floor(Math.random() * maxWidth));
+                const randomY = Math.max(padding, Math.floor(Math.random() * maxHeight));
+        
+                noBtn.style.position = 'fixed';
+                noBtn.style.zIndex = '1000';
+                noBtn.style.left = `${randomX}px`;
+                noBtn.style.top = `${randomY}px`;
+            }
+        };
+        
+        const handleNoInteraction = (e) => {
+            noCount++;
+            
+            if (noCount >= 10) {
+                moveButton(e);
+            }
+        
+            noBtn.classList.add('shake');
+            setTimeout(() => noBtn.classList.remove('shake'), 300);
+            
+            noBtn.innerText = phrases[Math.min(noCount, phrases.length - 1)];
+        
+            const newSize = 1 + (noCount * 0.4);
+            yesBtn.style.transform = `scale(${newSize})`;
+        };
+        
+        noBtn.addEventListener('click', handleNoInteraction);
+        
+        noBtn.addEventListener('mouseover', (e) => {
+            if (noCount >= 10) moveButton(e);
+        });
+        
+        noBtn.addEventListener('touchstart', (e) => {
+            if (noCount >= 10) {
+                moveButton(e);
+            } else {
+                handleNoInteraction(e);
+            }
+        }, { passive: false });
+        
+        yesBtn.addEventListener('click', () => {
+            questionContent.classList.add('hidden');
+            successContent.classList.remove('hidden');
+            displayImage.src = "https://i.pinimg.com/originals/16/91/6f/16916f50a451229adef4396fca1cabc9.gif";
+            setInterval(createHeart, 100);
+        });
+    </script>
+</body>
+</html>
